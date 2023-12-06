@@ -1,4 +1,4 @@
-name: "DGT tag get action"
+name: "DGT tag split action"
 description: "Get a version number from a specific tag"
 author: "Gert Meulyzer"
 inputs:
