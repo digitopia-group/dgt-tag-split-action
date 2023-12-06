@@ -30,5 +30,5 @@ func main() {
 		version = parts[1]
 	}
 
-	fmt.Fprintf(f, `versionnr=%s\n`, version)
+	fmt.Fprintf(f, `versionnr=%s`, version)
 }
