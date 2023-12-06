@@ -1,13 +1,13 @@
-name: "Go Container Action Template"
-description: "Get started with Go Container actions"
-author: "Jacob Tomlinson"
+name: "DGT tag get action"
+description: "Get a version number from a specific tag"
+author: "Gert Meulyzer"
 inputs:
-  myInput:
-    description: "Input to use"
-    default: "world"
+  refname:
+    description: "The tag needs to be in here."
+    default: "${{ github.ref_name }}"
 outputs:
-  myOutput:
-    description: "Output from the action"
+  versionnr:
+    description: "The version number detected in the action."
 runs:
   using: "docker"
   image: "Dockerfile"

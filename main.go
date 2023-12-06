@@ -3,12 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
-	myInput := os.Getenv("INPUT_MYINPUT")
+	refName := os.Getenv("INPUT_REFNAME")
 
-	output := fmt.Sprintf("Hello %s", myInput)
+	parts := strings.Split(refName, "_v")
+	if len(parts) < 2 {
+		fmt.Println(`::set-output name=myOutput::nil`)
+	}
 
-	fmt.Println(fmt.Sprintf(`::set-output name=myOutput::%s`, output))
+	fmt.Println(fmt.Sprintf(`::set-output name=myOutput::%s`, parts[1]))
 }
