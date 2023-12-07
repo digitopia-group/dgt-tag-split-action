@@ -22,6 +22,6 @@ jobs:
           test "${{ steps.selftest.outputs.tag }}" == "nil"
           
       - name: Conditional run
-        if: ${{ steps.selftest.outputs.tag == "debug" }}
+        if: ${{ steps.selftest.outputs.tag == 'debug' }}
         run: |
           echo "condition met!"
