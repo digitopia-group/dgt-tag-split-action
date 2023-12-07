@@ -30,5 +30,6 @@ func main() {
 		version = parts[1]
 	}
 
-	fmt.Fprintf(f, `versionnr=%s`, version)
+	fmt.Fprintln(f, fmt.Sprintf(`tag=%s`, parts[0]))
+	fmt.Fprintln(f, fmt.Sprintf(`versionnr=%s`, version))
 }
