@@ -1,6 +1,13 @@
 ## Usage
 
-Describe how to use your action here.
+This action is meant for splitting a specifically formatted tag into its parts.  
+For example: "client_v0.0.3"  
+The action will return 2 variables: "tag" will be set to "client" and "versionnr" will be set to "0.0.3".  
+
+This is handy for monorepos that need to build some specific subprogram.  
+
+Maybe there is a better way of doing this, if you know one, please let me know.
+
 
 ### Example workflow
 
@@ -21,7 +28,7 @@ jobs:
       # Put your action repo here
       uses: houseofdigital/dgt-tag-split-action
 
-
+````
 ### Inputs
 
 | Input                | Description                                                                     |
