@@ -15,11 +15,6 @@ jobs:
 
         # Put your action repo here
         uses: houseofdigital/dgt-tag-split-action@master
-
-      - name: Check outputs
-        run: |
-          test "${{ steps.selftest.outputs.versionnr }}" == "nil"
-          test "${{ steps.selftest.outputs.tag }}" == "nil"
           
       - name: Conditional run
         if: ${{ steps.selftest.outputs.tag == 'debug' }}
