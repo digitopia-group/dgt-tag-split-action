@@ -39,8 +39,8 @@ jobs:
 
 | Output                                               | Description                                   |
 |------------------------------------------------------|-----------------------------------------------|
-| `tag`                                                | the first part of the tag                     |
-| `versionnr`                                          | the version that comes out of it.             |
+| `tag`                                                | The first part of the tag.                    |
+| `versionnr`                                          | The version that comes out of it.             |
 
 ## Examples
 
