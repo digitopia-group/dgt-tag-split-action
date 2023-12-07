@@ -19,4 +19,4 @@ jobs:
       - name: Conditional run
         if: ${{ steps.selftest.outputs.tag == 'debug' }}
         run: |
-          echo "condition met!"
+          echo "condition met, I think?"
