@@ -31,10 +31,10 @@ jobs:
         id: setenvvar2
         if: ${{ steps.selftest.outputs.tag == 'prod' }}
         run: |
-          echo "software_repo=software" >> "$GITHUB_ENV"
+          echo "SOFTWARE_REPO=software" >> "$GITHUB_ENV"
 
       - name: read env var
         id: readenvvar
-        run: printf '%s\n' "$software_repo"
+        run: echo "${{ env.SOFTWARE_REPO }}"
   
     
