@@ -25,7 +25,7 @@ jobs:
         id: setenvvar
         if: ${{ steps.selftest.outputs.tag == 'debug' }}
         run: |
-          echo "software_repo=software-test" >> "$GITHUB_ENV"
+          echo "SOFTWARE_REPO=software-test" >> "$GITHUB_ENV"
 
       - name: Set env var 2
         id: setenvvar2
