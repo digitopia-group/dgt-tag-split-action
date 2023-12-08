@@ -20,3 +20,21 @@ jobs:
         if: ${{ steps.selftest.outputs.tag == 'debug' }}
         run: |
           echo "condition met, I think?"
+
+      - name: Set env var
+        id: setenvvar
+        if: ${{ steps.selftest.outputs.tag == 'debug' }}
+        run: |
+          echo "software_repo=software-test" >> "$GITHUB_ENV"
+
+      - name: Set env var 2
+        id: setenvvar2
+        if: ${{ steps.selftest.outputs.tag == 'prod' }}
+        run: |
+          echo "software_repo=software" >> "$GITHUB_ENV"
+
+      - name: read env var
+        id: readenvvar
+        run: printf '%s\n' "$software_repo"
+  
+    
