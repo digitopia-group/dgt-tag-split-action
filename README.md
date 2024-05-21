@@ -26,7 +26,7 @@ jobs:
     - name: Run action
 
       # Put your action repo here
-      uses: houseofdigital/dgt-tag-split-action
+      uses: digitopia-group/dgt-tag-split-action
 
 ````
 ### Inputs
@@ -50,7 +50,7 @@ steps:
 - name: Run action
   id: myaction
 
-  uses: houseofdigital/dgt-tag-split-action
+  uses: digitopia-group/dgt-tag-split-action
 
 - name: Check outputs
     run: |
