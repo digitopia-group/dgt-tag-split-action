@@ -9,12 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
       - name: Self test
         id: selftest
 
         # Put your action repo here
-        uses: houseofdigital/dgt-tag-split-action@master
+        uses: digitopia-group/dgt-tag-split-action@master
           
       - name: Conditional run
         if: ${{ steps.selftest.outputs.tag == 'debug' }}
