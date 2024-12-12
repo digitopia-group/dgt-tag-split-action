@@ -24,12 +24,25 @@ func main() {
 	}
 	defer f.Close()
 
-	version := "nil"
-	parts := strings.Split(refName, "_v")
-	if len(parts) > 1 {
-		version = parts[1]
-	}
+	if strings.Contains(refName, "_v") {
+		version := "nil"
+		parts := strings.Split(refName, "_v")
+		if len(parts) > 1 {
+			version = parts[1]
+		}
 
-	fmt.Fprintln(f, fmt.Sprintf(`tag=%s`, parts[0]))
-	fmt.Fprintln(f, fmt.Sprintf(`versionnr=%s`, version))
+		fmt.Fprintln(f, fmt.Sprintf(`tag=%s`, parts[0]))
+		fmt.Fprintln(f, fmt.Sprintf(`versionnr=%s`, version))
+		return
+	}
+	epoch, _, found := strings.Cut(refName, ":")
+	if found {
+		switch epoch {
+		case "1", "2":
+			fmt.Fprintln(f, "tag=debug")
+		default:
+			fmt.Fprintln(f, "tag=prod")
+		}
+		fmt.Fprintln(f, fmt.Sprintf("versionnr=%s", refName))
+	}
 }
