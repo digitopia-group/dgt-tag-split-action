@@ -35,14 +35,15 @@ func main() {
 		fmt.Fprintf(f, `versionnr=%s\n`, version)
 		return
 	}
-	epoch, _, found := strings.Cut(refName, ":")
-	if found {
+	epoch, version, found := strings.Cut(refName, "#")
+	if found && len(epoch) == 1 {
 		switch epoch {
 		case "1", "2":
 			fmt.Fprintln(f, "tag=debug")
 		default:
 			fmt.Fprintln(f, "tag=prod")
 		}
-		fmt.Fprintf(f, "versionnr=%s\n", refName)
+		refName = strings.Replace(refName, "#", ":", 0)
+		fmt.Fprintf(f, "versionnr=%s:%s\n", epoch, version)
 	}
 }
