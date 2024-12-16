@@ -33,6 +33,7 @@ func main() {
 
 		fmt.Fprintf(f, `tag=%s\n`, parts[0])
 		fmt.Fprintf(f, `versionnr=%s\n`, version)
+		fmt.Fprintf(f, `fullversion=%s\n`, refName)
 		return
 	}
 	epoch, version, found := strings.Cut(refName, "#")
@@ -43,7 +44,8 @@ func main() {
 		default:
 			fmt.Fprintln(f, "tag=prod")
 		}
-		refName = strings.Replace(refName, "#", ":", 0)
+		refName = strings.Replace(refName, "#", ":", 1)
+		fmt.Fprintf(f, "fullversion=%s\n", refName)
 		fmt.Fprintf(f, "versionnr=%s:%s\n", epoch, version)
 	}
 }
