@@ -47,5 +47,6 @@ func main() {
 		refName = strings.Replace(refName, "#", ":", 1)
 		fmt.Fprintf(f, "fullversion=%s\n", refName)
 		fmt.Fprintf(f, "versionnr=%s:%s\n", epoch, version)
+		fmt.Fprintf(f, "filenameversion=%s%%3A%s\n", epoch, version)
 	}
 }
