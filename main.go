@@ -37,7 +37,14 @@ func main() {
 		return
 	}
 	epoch, version, found := strings.Cut(refName, "#")
-	if found && len(epoch) == 1 {
+	if !found {
+		fmt.Println(`Not a valid tag name.
+ Use <epoch>#<major>.<minor>.<patch>.<build>-<descwithoutspaces> as tag.
+ For example:
+    1#0.7.3.12-testcustomerx`)
+		return
+	}
+	if len(epoch) == 1 {
 		switch epoch {
 		case "1", "2":
 			fmt.Fprintln(f, "tag=debug")
@@ -48,5 +55,7 @@ func main() {
 		fmt.Fprintf(f, "fullversion=%s\n", refName)
 		fmt.Fprintf(f, "versionnr=%s:%s\n", epoch, version)
 		fmt.Fprintf(f, "filenameversion=%s%%3A%s\n", epoch, version)
+		return
 	}
+	fmt.Println("Epoch numbers should be 1 digit only: 1 -> 9")
 }
