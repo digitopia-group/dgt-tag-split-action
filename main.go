@@ -3,7 +3,23 @@ package main
 import (
 	"fmt"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
+)
+
+type Version struct {
+	Epoch    int
+	Major    int
+	Minor    int
+	Patch    int
+	Hotfix   int
+	Revision string
+}
+
+var (
+	regexString = `^((?P<epoch>\d+):)?(?P<upstream_version>[A-Za-z0-9.+:~-]+?)(-(?P<debian_revision>[A-Za-z0-9+.~]+))?$`
+	re          = regexp.MustCompile(regexString)
 )
 
 /*
@@ -33,29 +49,91 @@ func main() {
 
 		fmt.Fprintf(f, `tag=%s\n`, parts[0])
 		fmt.Fprintf(f, `versionnr=%s\n`, version)
-		fmt.Fprintf(f, `fullversion=%s\n`, refName)
+		fmt.Fprintf(f, `filenameversion=%s\n`, refName)
 		return
 	}
-	epoch, version, found := strings.Cut(refName, "#")
-	if !found {
-		fmt.Println(`Not a valid tag name.
- Use <epoch>#<major>.<minor>.<patch>.<build>-<descwithoutspaces> as tag.
- For example:
-    1#0.7.3.12-testcustomerx`)
+
+	refName = strings.Replace(refName, "#", ":", 1)
+	version := ParseVersionNumber(refName)
+	if !version.IsValid() {
+		fmt.Println("Not a valid version number. Aborting.")
 		return
 	}
-	if len(epoch) == 1 {
-		switch epoch {
-		case "1", "2":
-			fmt.Fprintln(f, "tag=debug")
-		default:
-			fmt.Fprintln(f, "tag=prod")
+	switch version.Epoch {
+	case 9:
+		fmt.Fprintln(f, "tag=debug")
+	default:
+		fmt.Fprintln(f, "tag=prod")
+	}
+
+	fmt.Fprintln(f, "versionnr="+version.String())
+	fmt.Fprintln(f, "filenameversion="+version.FilenameVersion())
+}
+
+func (v Version) String() string {
+	result := strings.Builder{}
+	result.WriteString(fmt.Sprintf("%d:", v.Epoch))
+	result.WriteString(fmt.Sprintf("%d.%d.%d.%d", v.Major, v.Minor, v.Patch, v.Hotfix))
+	result.WriteString(fmt.Sprintf("-e%d", v.Epoch))
+	if v.Revision != "" {
+		result.WriteString(fmt.Sprintf("+%s", v.Revision))
+	}
+	return result.String()
+}
+
+func (v Version) FilenameVersion() string {
+	result := strings.Builder{}
+	result.WriteString(fmt.Sprintf("%d.%d.%d.%d", v.Major, v.Minor, v.Patch, v.Hotfix))
+	result.WriteString(fmt.Sprintf("-e%d", v.Epoch))
+	if v.Revision != "" {
+		result.WriteString(fmt.Sprintf("+%s", v.Revision))
+	}
+	return result.String()
+}
+
+func (v Version) IsValid() bool {
+	if v.Epoch == 0 &&
+		v.Major == 0 &&
+		v.Minor == 0 &&
+		v.Patch == 0 &&
+		v.Hotfix == 0 &&
+		v.Revision == "" {
+		return false
+	}
+	return true
+}
+
+func ParseVersionNumber(versionNumber string) (result Version) {
+	trimmed := strings.TrimSpace(versionNumber)
+	matches := re.FindStringSubmatch(trimmed)
+	if matches == nil {
+		return Version{0, 0, 0, 0, 0, ""}
+	}
+	epochIndex := re.SubexpIndex("epoch")
+	upstreamIndex := re.SubexpIndex("upstream_version")
+	revisionIndex := re.SubexpIndex("debian_revision")
+
+	epoch, err := strconv.Atoi(matches[epochIndex])
+	if err != nil {
+		result.Epoch = 0
+	} else {
+		result.Epoch = epoch
+	}
+	parts := strings.Split(matches[upstreamIndex], ".")
+	// fmt.Println(len(parts))
+	for i := 0; i < len(parts); i++ {
+		switch i {
+		case 0:
+			result.Major, _ = strconv.Atoi(parts[i])
+		case 1:
+			result.Minor, _ = strconv.Atoi(parts[i])
+		case 2:
+			result.Patch, _ = strconv.Atoi(parts[i])
+		case 3:
+			result.Hotfix, _ = strconv.Atoi(parts[i])
 		}
-		refName = strings.Replace(refName, "#", ":", 1)
-		fmt.Fprintf(f, "fullversion=%s\n", refName)
-		fmt.Fprintf(f, "versionnr=%s:%s\n", epoch, version)
-		fmt.Fprintf(f, "filenameversion=%s%%3A%s\n", epoch, version)
-		return
 	}
-	fmt.Println("Epoch numbers should be 1 digit only: 1 -> 9")
+
+	result.Revision = matches[revisionIndex]
+	return result
 }
