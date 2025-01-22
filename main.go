@@ -49,7 +49,7 @@ func main() {
 
 		fmt.Fprintf(f, `tag=%s\n`, parts[0])
 		fmt.Fprintf(f, `versionnr=%s\n`, version)
-		fmt.Fprintf(f, `filenameversion=%s\n`, refName)
+		fmt.Fprintf(f, `filenameversion=%s\n`, version)
 		return
 	}
 
@@ -65,7 +65,6 @@ func main() {
 	default:
 		fmt.Fprintln(f, "tag=prod")
 	}
-
 	fmt.Fprintln(f, "versionnr="+version.String())
 	fmt.Fprintln(f, "filenameversion="+version.FilenameVersion())
 }
