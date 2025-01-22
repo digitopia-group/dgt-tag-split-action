@@ -45,11 +45,14 @@ func main() {
 		parts := strings.Split(refName, "_v")
 		if len(parts) > 1 {
 			version = parts[1]
+		} else {
+			fmt.Println("NO SECOND PART FOUND AFTER _v")
 		}
 
 		fmt.Fprintf(f, `tag=%s\n`, parts[0])
 		fmt.Fprintf(f, `versionnr=%s\n`, version)
 		fmt.Fprintf(f, `filenameversion=%s\n`, version)
+		fmt.Printf("tag=%s\nversionnr=%s\nfilenameversion=%s\n", parts[0], version, version)
 		return
 	}
 
