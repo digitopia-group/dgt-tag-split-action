@@ -55,8 +55,6 @@ func main() {
 		} else {
 			fmt.Println("NO SECOND PART FOUND AFTER _v, VERSION WILL BE 'nil'")
 		}
-		fmt.Printf("tag=%s\nversionnr=%s\nfilenameversion=%s\n", parts[0], version, version)
-
 		fmt.Fprintf(outputHandle, `tag=%s\n`, parts[0])
 		fmt.Fprintf(outputHandle, `versionnr=%s\n`, version)
 		fmt.Fprintf(outputHandle, `filenameversion=%s\n`, version)
@@ -76,17 +74,14 @@ func main() {
 	case 9:
 		fmt.Fprintln(outputHandle, "tag=debug")
 		fmt.Fprintln(envHandle, "tag=debug")
-		fmt.Println("tag=debug")
 	default:
 		fmt.Fprintln(outputHandle, "tag=prod")
 		fmt.Fprintln(envHandle, "tag=prod")
-		fmt.Println("tag=prod")
 	}
 	fmt.Fprintln(outputHandle, "versionnr="+version.String())
 	fmt.Fprintln(outputHandle, "filenameversion="+version.FilenameVersion())
 	fmt.Fprintln(envHandle, "versionnr="+version.String())
 	fmt.Fprintln(envHandle, "filenameversion="+version.FilenameVersion())
-	fmt.Printf("versionnr=%s\nfilenameversion=%s\n", version.String(), version.FilenameVersion())
 }
 
 func (v Version) String() string {
