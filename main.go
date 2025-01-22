@@ -33,12 +33,19 @@ run: echo "{name}={value}" >> $GITHUB_OUTPUT
 func main() {
 	refName := os.Getenv("INPUT_REFNAME")
 	outputFile := os.Getenv("GITHUB_OUTPUT")
+	envFile := os.Getenv("GITHUB_ENV")
 
 	outputHandle, err := os.Create(outputFile)
 	if err != nil {
 		panic(err)
 	}
 	defer outputHandle.Close()
+
+	envHandle, err := os.Create(envFile)
+	if err != nil {
+		panic(err)
+	}
+	defer envHandle.Close()
 
 	if strings.HasPrefix(refName, "debug_v") || strings.HasPrefix(refName, "prod_v") {
 		version := "nil"
@@ -53,6 +60,9 @@ func main() {
 		fmt.Fprintf(outputHandle, `tag=%s\n`, parts[0])
 		fmt.Fprintf(outputHandle, `versionnr=%s\n`, version)
 		fmt.Fprintf(outputHandle, `filenameversion=%s\n`, version)
+		fmt.Fprintf(envHandle, `tag=%s\n`, parts[0])
+		fmt.Fprintf(envHandle, `versionnr=%s\n`, version)
+		fmt.Fprintf(envHandle, `filenameversion=%s\n`, version)
 		return
 	}
 
@@ -65,13 +75,17 @@ func main() {
 	switch version.Epoch {
 	case 9:
 		fmt.Fprintln(outputHandle, "tag=debug")
+		fmt.Fprintln(envHandle, "tag=debug")
 		fmt.Println("tag=debug")
 	default:
 		fmt.Fprintln(outputHandle, "tag=prod")
+		fmt.Fprintln(envHandle, "tag=prod")
 		fmt.Println("tag=prod")
 	}
 	fmt.Fprintln(outputHandle, "versionnr="+version.String())
 	fmt.Fprintln(outputHandle, "filenameversion="+version.FilenameVersion())
+	fmt.Fprintln(envHandle, "versionnr="+version.String())
+	fmt.Fprintln(envHandle, "filenameversion="+version.FilenameVersion())
 	fmt.Printf("versionnr=%s\nfilenameversion=%s\n", version.String(), version.FilenameVersion())
 }
 
