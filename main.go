@@ -34,25 +34,25 @@ func main() {
 	refName := os.Getenv("INPUT_REFNAME")
 	outputFile := os.Getenv("GITHUB_OUTPUT")
 
-	f, err := os.Create(outputFile)
+	outputHandle, err := os.Create(outputFile)
 	if err != nil {
 		panic(err)
 	}
-	defer f.Close()
+	defer outputHandle.Close()
 
-	if strings.Contains(refName, "_v") {
+	if strings.HasPrefix(refName, "debug_v") || strings.HasPrefix(refName, "prod_v") {
 		version := "nil"
 		parts := strings.Split(refName, "_v")
 		if len(parts) > 1 {
 			version = parts[1]
 		} else {
-			fmt.Println("NO SECOND PART FOUND AFTER _v")
+			fmt.Println("NO SECOND PART FOUND AFTER _v, VERSION WILL BE 'nil'")
 		}
-
-		fmt.Fprintf(f, `tag=%s\n`, parts[0])
-		fmt.Fprintf(f, `versionnr=%s\n`, version)
-		fmt.Fprintf(f, `filenameversion=%s\n`, version)
 		fmt.Printf("tag=%s\nversionnr=%s\nfilenameversion=%s\n", parts[0], version, version)
+
+		fmt.Fprintf(outputHandle, `tag=%s\n`, parts[0])
+		fmt.Fprintf(outputHandle, `versionnr=%s\n`, version)
+		fmt.Fprintf(outputHandle, `filenameversion=%s\n`, version)
 		return
 	}
 
@@ -64,12 +64,15 @@ func main() {
 	}
 	switch version.Epoch {
 	case 9:
-		fmt.Fprintln(f, "tag=debug")
+		fmt.Fprintln(outputHandle, "tag=debug")
+		fmt.Println("tag=debug")
 	default:
-		fmt.Fprintln(f, "tag=prod")
+		fmt.Fprintln(outputHandle, "tag=prod")
+		fmt.Println("tag=prod")
 	}
-	fmt.Fprintln(f, "versionnr="+version.String())
-	fmt.Fprintln(f, "filenameversion="+version.FilenameVersion())
+	fmt.Fprintln(outputHandle, "versionnr="+version.String())
+	fmt.Fprintln(outputHandle, "filenameversion="+version.FilenameVersion())
+	fmt.Printf("versionnr=%s\nfilenameversion=%s\n", version.String(), version.FilenameVersion())
 }
 
 func (v Version) String() string {
