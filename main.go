@@ -55,12 +55,12 @@ func main() {
 		} else {
 			fmt.Println("NO SECOND PART FOUND AFTER _v, VERSION WILL BE 'nil'")
 		}
-		fmt.Fprintf(outputHandle, `tag=%s\n`, parts[0])
-		fmt.Fprintf(outputHandle, `versionnr=%s\n`, version)
-		fmt.Fprintf(outputHandle, `filenameversion=%s\n`, version)
-		fmt.Fprintf(envHandle, `tag=%s\n`, parts[0])
-		fmt.Fprintf(envHandle, `versionnr=%s\n`, version)
-		fmt.Fprintf(envHandle, `filenameversion=%s\n`, version)
+		fmt.Fprintln(outputHandle, "tag="+parts[0])
+		fmt.Fprintln(outputHandle, "versionnr="+version)
+		fmt.Fprintln(outputHandle, "filenameversion="+version)
+		fmt.Fprintln(envHandle, "tag="+parts[0])
+		fmt.Fprintln(envHandle, "versionnr="+version)
+		fmt.Fprintln(envHandle, "filenameversion="+version)
 		return
 	}
 
