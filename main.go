@@ -6,15 +6,16 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Version struct {
-	Epoch    int
-	Major    int
-	Minor    int
-	Patch    int
-	Hotfix   int
-	Revision string
+	Epoch       int
+	Major       int
+	Minor       int
+	Patch       int
+	Buildnumber uint
+	Revision    string
 }
 
 var (
@@ -47,6 +48,8 @@ func main() {
 	}
 	defer envHandle.Close()
 
+	output := OutputWriter(outputHandle, envHandle)
+
 	if strings.HasPrefix(refName, "debug_v") || strings.HasPrefix(refName, "prod_v") {
 		version := "nil"
 		parts := strings.Split(refName, "_v")
@@ -55,12 +58,9 @@ func main() {
 		} else {
 			fmt.Println("NO SECOND PART FOUND AFTER _v, VERSION WILL BE 'nil'")
 		}
-		fmt.Fprintln(outputHandle, "tag="+parts[0])
-		fmt.Fprintln(outputHandle, "versionnr="+version)
-		fmt.Fprintln(outputHandle, "filenameversion="+version)
-		fmt.Fprintln(envHandle, "tag="+parts[0])
-		fmt.Fprintln(envHandle, "versionnr="+version)
-		fmt.Fprintln(envHandle, "filenameversion="+version)
+		output("tag=" + parts[0])
+		output("versionnr=" + version)
+		output("filenameversion=" + version)
 		return
 	}
 
@@ -72,22 +72,42 @@ func main() {
 	}
 	switch version.Epoch {
 	case 9:
-		fmt.Fprintln(outputHandle, "tag=debug")
-		fmt.Fprintln(envHandle, "tag=debug")
+		output("tag=debug")
 	default:
-		fmt.Fprintln(outputHandle, "tag=prod")
-		fmt.Fprintln(envHandle, "tag=prod")
+		output("tag=prod")
 	}
-	fmt.Fprintln(outputHandle, "versionnr="+version.String())
-	fmt.Fprintln(outputHandle, "filenameversion="+version.FilenameVersion())
-	fmt.Fprintln(envHandle, "versionnr="+version.String())
-	fmt.Fprintln(envHandle, "filenameversion="+version.FilenameVersion())
+
+	output("versionnr=" + version.String())
+	output("filenameversion=" + version.FilenameVersion())
+	output("fullversion=" + version.FullVersion())
+	output("verionwithbuildnr" + version.VersionWithBuildnr())
+}
+
+func OutputWriter(handles ...*os.File) func(string) {
+	return func(s string) {
+		for _, h := range handles {
+			fmt.Fprintln(h, s)
+		}
+	}
 }
 
 func (v Version) String() string {
 	result := strings.Builder{}
+	result.WriteString(fmt.Sprintf("%d.%d.%d", v.Major, v.Minor, v.Patch))
+	return result.String()
+}
+
+func (v Version) VersionWithBuildnr() string {
+	result := strings.Builder{}
+	result.WriteString(fmt.Sprintf("%d.%d.%d.%d", v.Major, v.Minor, v.Patch, v.Buildnumber))
+	return result.String()
+
+}
+
+func (v Version) FullVersion() string {
+	result := strings.Builder{}
 	result.WriteString(fmt.Sprintf("%d:", v.Epoch))
-	result.WriteString(fmt.Sprintf("%d.%d.%d.%d", v.Major, v.Minor, v.Patch, v.Hotfix))
+	result.WriteString(fmt.Sprintf("%d.%d.%d.%d", v.Major, v.Minor, v.Patch, v.Buildnumber))
 	result.WriteString(fmt.Sprintf("-e%d", v.Epoch))
 	if v.Revision != "" {
 		result.WriteString(fmt.Sprintf("+%s", v.Revision))
@@ -97,7 +117,7 @@ func (v Version) String() string {
 
 func (v Version) FilenameVersion() string {
 	result := strings.Builder{}
-	result.WriteString(fmt.Sprintf("%d.%d.%d.%d", v.Major, v.Minor, v.Patch, v.Hotfix))
+	result.WriteString(fmt.Sprintf("%d.%d.%d.%d", v.Major, v.Minor, v.Patch, v.Buildnumber))
 	result.WriteString(fmt.Sprintf("-e%d", v.Epoch))
 	if v.Revision != "" {
 		result.WriteString(fmt.Sprintf("+%s", v.Revision))
@@ -110,11 +130,26 @@ func (v Version) IsValid() bool {
 		v.Major == 0 &&
 		v.Minor == 0 &&
 		v.Patch == 0 &&
-		v.Hotfix == 0 &&
+		v.Buildnumber < 100 &&
 		v.Revision == "" {
 		return false
 	}
 	return true
+}
+
+var _buildnr uint
+
+func GenerateBuildNumber() uint {
+	if _buildnr != 99 {
+		return _buildnr
+	}
+	result, err := strconv.ParseUint(time.Now().UTC().Format("060102150405"), 10, 32)
+	if err != nil {
+		_buildnr = 99
+		return 99
+	}
+	_buildnr = uint(result)
+	return _buildnr
 }
 
 func ParseVersionNumber(versionNumber string) (result Version) {
@@ -143,11 +178,10 @@ func ParseVersionNumber(versionNumber string) (result Version) {
 			result.Minor, _ = strconv.Atoi(parts[i])
 		case 2:
 			result.Patch, _ = strconv.Atoi(parts[i])
-		case 3:
-			result.Hotfix, _ = strconv.Atoi(parts[i])
 		}
 	}
 
+	result.Buildnumber = GenerateBuildNumber()
 	result.Revision = matches[revisionIndex]
 	return result
 }
