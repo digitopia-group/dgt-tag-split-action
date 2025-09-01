@@ -80,7 +80,7 @@ func main() {
 	output("versionnr=" + version.String())
 	output("filenameversion=" + version.FilenameVersion())
 	output("fullversion=" + version.FullVersion())
-	output("verionwithbuildnr" + version.VersionWithBuildnr())
+	output("verionwithbuildnr=" + version.VersionWithBuildnr())
 }
 
 func OutputWriter(handles ...*os.File) func(string) {
@@ -140,11 +140,14 @@ func (v Version) IsValid() bool {
 var _buildnr uint
 
 func GenerateBuildNumber() uint {
-	if _buildnr != 99 {
+	if _buildnr > 100 {
 		return _buildnr
 	}
-	result, err := strconv.ParseUint(time.Now().UTC().Format("060102150405"), 10, 32)
+	buildnr := time.Now().UTC().Format("0601021504")
+	fmt.Println(buildnr)
+	result, err := strconv.ParseUint(buildnr, 10, 32)
 	if err != nil {
+		fmt.Println(err)
 		_buildnr = 99
 		return 99
 	}
