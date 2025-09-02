@@ -87,6 +87,7 @@ func OutputWriter(handles ...*os.File) func(string) {
 	return func(s string) {
 		for _, h := range handles {
 			fmt.Fprintln(h, s)
+			fmt.Println("Setting", s, "in", h.Name())
 		}
 	}
 }
