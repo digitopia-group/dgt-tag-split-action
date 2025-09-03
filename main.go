@@ -80,7 +80,7 @@ func main() {
 	output("versionnr=" + version.String())
 	output("filenameversion=" + version.FilenameVersion())
 	output("fullversion=" + version.FullVersion())
-	output("verionwithbuildnr=" + version.VersionWithBuildnr())
+	output("versionwithbuildnr=" + version.VersionWithBuildnr())
 }
 
 func OutputWriter(handles ...*os.File) func(string) {
